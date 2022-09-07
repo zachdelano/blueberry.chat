@@ -11,6 +11,15 @@ const PORT = process.env.port || DEFAULT_PORT;
 
 app.use(cors);
 
+const spaceNamespace = io.of(/^\/space\/\w+$/)
+spaceNamespace.on('connection', socket => {
+  console.log(socket.id, 'connected to space namespace')
+
+  socket.on('join_room', room => {
+    socket.join(room)
+  })
+})
+
 io.on('connection', socket => {
     // get active or connected socket
     socket.emit('activeUsers');
@@ -19,7 +28,6 @@ io.on('connection', socket => {
 
     // when a chat event is emitted 
     socket.on('chat', (id, chat) => {
-      console.log('chat received', JSON.stringify(id, chat))
       io.emit('sendChat', id, chat, socket.id);
     });
 
