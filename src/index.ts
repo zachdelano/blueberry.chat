@@ -11,12 +11,16 @@ const PORT = process.env.port || DEFAULT_PORT;
 
 app.use(cors);
 
-const spaceNamespace = io.of(/^\/space\/\w+$/)
-spaceNamespace.on('connection', socket => {
+const spaceNs = io.of(/^\/space\/\w+$/)
+spaceNs.on('connection', socket => {
   console.log(socket.id, 'connected to space namespace')
 
   socket.on('join_room', room => {
     socket.join(room)
+  })
+
+  socket.on('message_room', (room, message) => {
+    spaceNs.to(room).emit('message_room', room, message)
   })
 })
 
